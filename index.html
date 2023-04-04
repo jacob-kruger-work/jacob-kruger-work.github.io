@@ -25,6 +25,16 @@ var x = document.getElementById("div_out");
 var lat_prior = 0.0;
 var lng_prior = 0.0;
 var t_prior = Date.now();
+var s_speed = "";
+
+
+function say_something(s_msg) {
+    if (typeof(window.speechSynthesis)!="undefined") {
+    var msg = new SpeechSynthesisUtterance();
+    msg.text = s_msg;
+    window.speechSynthesis.speak(msg);
+    }// end of undefined check
+}// end of say_something function
 
 function calculate_speed(t1, lat1, lng1, t2, lat2, lng2) {
   // From Caspar Kleijne's answer starts
@@ -66,6 +76,7 @@ function showPosition(position) {
   var current_speed = calculate_speed(t_prior, lat_prior, lng_prior, t_now, lat_now, lng_now);
   if (current_speed<1.0) { current_speed = 0.0; }
   current_speed = Math.round(current_speed);
+  if (current_speed>0) { s_speed = String(current_speed) + " KM/H"; } else { s_speed = ""; }
   x.innerHTML = "Latitude: " + lat_now +
   "<br>Longitude: " + lng_now +
   "<br>speed: " + current_speed + " KM/H";
@@ -103,6 +114,9 @@ $("#a_check").click( function(event) {
 	event.preventDefault();
 	$("#div_out").text("");
 	if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(showPosition); }
+  window.setTimeout( function() {
+  say_something(s_speed);
+  }, 2000);
 	  window.setTimeout( function() {
       $("#a_check").trigger("click");
   }, 5000);
