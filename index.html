@@ -1,0 +1,173 @@
+﻿<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<META http-equiv="Content-Style-Type" content="text/css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script type="text/javascript">
+$(document).ready( function() {
+
+window.onerror = function(msg, url, line, column, rerr) {
+ alert('Error: ' + msg + ' Line: ' + line + ' character: ' + column + ' url ' + url + ' ' + rerr); 
+ return true;   
+}//end of javascript debugging function
+
+function do_alert(s_in) {
+	s_in = String(s_in).replace("\n", "<br />");
+	$("#div_alert").show();
+	//document.getElementById("div_alert").innerHTML = s_in;
+	$("#div_alert").html(s_in);
+}//end of do_alert function
+
+var x = document.getElementById("div_out");
+
+if (navigator.geolocation) {
+	navigator.geolocation.getCurrentPosition(showPosition, showError);
+} else {
+	x.innerHTML = "Geolocation is not supported by this browser.";
+}
+
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude +
+  "<br>heading: " + position.coords.heading +
+  "<br>speed: " + position.coords.speed;
+}//end of showPosition function
+
+function showError(error) {
+  switch(error.code) {
+    case error.PERMISSION_DENIED:
+      x.innerHTML = "User denied the request for Geolocation."
+      break;
+    case error.POSITION_UNAVAILABLE:
+      x.innerHTML = "Location information is unavailable."
+      break;
+    case error.TIMEOUT:
+      x.innerHTML = "The request to get user location timed out."
+      break;
+    case error.UNKNOWN_ERROR:
+      x.innerHTML = "An unknown error occurred."
+      break;
+  }
+}//end of showError function
+
+$("#a_check").click( function(event) {
+	event.preventDefault();
+	$("#div_out").text("");
+	if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(showPosition); }
+});//end of a_check click event
+
+var s_msg = "";
+if (String(s_msg).length>0) {
+	window.setTimeout( function() {
+		do_alert(s_msg);
+	}, 300);
+}
+});//end of document ready
+</script>
+<title>jQuery test - GeoLocation query</title>
+<style>
+body {
+    font-family: helvetica,arial;
+    color: #000000;
+    font-size: 12px;
+    background-color: #FFFFFF;
+}
+h2
+{
+    font-family: helvetica,arial;
+    font-size: 16px;
+    color: #000000;
+}
+a
+{
+    color: blue;
+text-decoration: underline;
+}
+a.visited
+{
+    color: green;
+text-decoration: underline;
+}
+.error {
+font-weight: bold;
+text-align: center;
+}
+#div_alert {
+font-weight: bold;
+display: none;
+text-align: center;
+}
+div.alert {
+font-weight: bold;
+text-align: center;
+}
+table {
+border-width: 0px;
+}
+th.form {
+text-align: right;
+}
+div.form {
+text-align: center;
+}
+div.menu_top {
+text-align: center;
+}
+table.menu_top {
+border-width: 0px;
+width: 100%;
+}
+div.menu_specific {
+text-align: center;
+}
+ul.top_menu_specific {
+list-style-type: none;
+margin: 0;
+padding: 0;
+overflow: hidden;
+}
+ul.top_menu_specific li {
+    float:   left;
+}
+ul.top_menu_specific li a {
+    display: block;
+text-align: center;
+padding: 3px;
+}
+table.main_layout {
+border-width: 0px;
+width: 100%;
+}
+table.main_layout td.left_specifics {
+width: 15%;
+vertical-align: top;
+}
+table.main_layout td.main_content {
+vertical-align: top;
+}
+table.data_listing {
+border-width: 1px;
+}
+table.data_listing th {
+text-decoration: underline;
+font-weight: bold;
+}
+.span_highlighted {
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+<section>
+<header>
+<h2>jQuery test - GPS</h2>
+</header>
+<div id="div_alert" role="alert" aria-live="assertive">&nbsp;</div>
+<div role="main">
+<a href="#" id="a_check">Check it</a><br><br>
+<div id="div_out" role="alert" aria-live="assertive"></div>
+</div>
+</section>
+</body>
+</html>
