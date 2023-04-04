@@ -19,19 +19,59 @@ function do_alert(s_in) {
 	$("#div_alert").html(s_in);
 }//end of do_alert function
 
-var x = document.getElementById("div_out");
+try {
 
+var x = document.getElementById("div_out");
+var lat_prior = 0.0;
+var lng_prior = 0.0;
+var t_prior = Date.now();
+
+function calculate_speed(t1, lat1, lng1, t2, lat2, lng2) {
+  // From Caspar Kleijne's answer starts
+  /** Converts numeric degrees to radians */
+  if (typeof(Number.prototype.toRad) === "undefined") {
+    Number.prototype.toRad = function() {
+      return this * Math.PI / 180;
+    }
+  }
+  // From Caspar Kleijne's answer ends
+  // From cletus' answer starts
+  var R = 6371; // km
+  var dLat = (lat2-lat1).toRad();
+  var dLon = (lng2-lng1).toRad();
+  var lat1 = lat1.toRad();
+  var lat2 = lat2.toRad();
+
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.sin(dLon/2) * Math.sin(dLon/2) * Math.cos(lat1) *    Math.cos(lat2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var distance = R * c;
+  // From cletus' answer ends
+
+  return distance / t2 - t1;
+}// end of calculate_speed function
+
+function do_position() {
 if (navigator.geolocation) {
 	navigator.geolocation.getCurrentPosition(showPosition, showError);
 } else {
 	x.innerHTML = "Geolocation is not supported by this browser.";
 }
+}// end of do_position function
 
 function showPosition(position) {
-  x.innerHTML = "Latitude: " + position.coords.latitude +
-  "<br>Longitude: " + position.coords.longitude +
-  "<br>heading: " + position.coords.heading +
-  "<br>speed: " + position.coords.speed;
+  var lat_now = position.coords.latitude;
+  var lng_now = position.coords.longitude;
+  var t_now = Date.now();
+  var current_speed = calculate_speed(t_prior, lat_prior, lng_prior, t_now, lat_now, lng_now);
+  if (current_speed<1.0) { current_speed = 0.0; }
+  current_speed = Math.round(current_speed);
+  x.innerHTML = "Latitude: " + lat_now +
+  "<br>Longitude: " + lng_now +
+  "<br>speed: " + current_speed + " KM/H";
+  lat_prior = lat_now;
+  lng_prior = lng_now;
+  t_prior = t_now;
 }//end of showPosition function
 
 function showError(error) {
@@ -51,10 +91,21 @@ function showError(error) {
   }
 }//end of showError function
 
+do_position();
+
+} catch(e) {
+	var s_err = String(e.name) + "\nmessage:" + String(e.message);
+	s_err = (typeof(e.lineNumber)!="undefined") ? s_err + "\nline:" + String(e.lineNumber) : s_err;
+	alert("Error! " + s_err);
+}//end of catch
+
 $("#a_check").click( function(event) {
 	event.preventDefault();
 	$("#div_out").text("");
 	if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(showPosition); }
+	  window.setTimeout( function() {
+      $("#a_check").trigger("click");
+  }, 5000);
 });//end of a_check click event
 
 var s_msg = "";
