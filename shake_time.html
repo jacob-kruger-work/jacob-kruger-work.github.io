@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<META http-equiv="Content-Type" content="text/html; charset=utf-8">
+<META http-equiv="Content-Style-Type" content="text/css">
+<title>Time output via vibration</title>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script type="text/javascript">
+$(document).ready( function() {
+
+try {
+
+function break_time(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    if (hours>12) { hours = hours - 12; }
+    var ten_minutes = 0;
+    if (minutes >9) {
+        ten_minutes = Math.floor(minutes/10);
+        minutes = minutes - (ten_minutes*10);
+    }// end of checking if minutes greater than 10
+    return [hours, ten_minutes, minutes];
+}// end of break_time function
+
+function vibrateOnShake() {
+    var currentDate = new Date();
+    var time_broken = break_time(currentDate);
+    var currentHours = time_broken[0];
+    var currentTens = time_broken[1];
+    var currentMinutes = time_broken[2];
+    // Create a vibration pattern - ms to vibrate, ms to pause...
+    var pattern = [];
+    for (I=0; I<currentHours; I++) {
+        pattern.push(300); pattern.push(100);
+    }// end of adding hours to pattern
+    pattern.push(300);
+    for (I=0; I<currentTens; I++) {
+        pattern.push(200); pattern.push(100);
+    }// end of adding tens to pattern
+    pattern.push(300);
+    for (I=0; I<currentMinutes; I++) {
+        pattern.push(100); pattern.push(100);
+    }// end of adding minutes to pattern
+  // Check if the device supports vibration
+  if (window.navigator.vibrate) {
+    // Vibrate the device according to the pattern
+    window.navigator.vibrate(pattern);
+  } else {
+      alert(String(currentHours) + " hours " + String(currentTens) + " tens of minutes " + String(currentMinutes) + " minutes");
+  }// end of checking for vibration support
+}// end of vibrateOnShake function
+
+// Add an event listener to detect the handset shake gesture
+window.addEventListener("devicemotion", vibrateOnShake);
+
+$("#btn_test").click( function(event) {
+vibrateOnShake()
+});// end of btn_test click event
+
+} catch(e) {
+	var s_err = String(e.name) + "\nmessage:" + String(e.message);
+	s_err = (typeof(e.lineNumber)!="undefined") ? s_err + "\nline:" + String(e.lineNumber) : s_err;
+	alert("Error! " + s_err);
+}//end of catch
+});//end of document ready
+</script>
+<link rel="stylesheet" type="text/css" href="http://blindza.co.za/styles.css" />
+</head>
+<div style="text-align: left;">
+<a href="http://www.blindza.co.za/" target="_blank"><img src="http://blindza.co.za/logo/blindza_logo_smaller46.jpg" alt="blindZA.co.za logo - white text on black background, with white border - and red braille version hovering in front of normal text" width="317" height="103" border="0" /></a>
+</div>
+<h2>Time output via vibration</h2>
+<div>
+<input type="button" id="btn_test" value="Try me...">
+</div>
+</body>
+</html>
